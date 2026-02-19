@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="shortcut icon" type="image/png" href="/icon.png" />
+    <link rel="shortcut icon" type="image/png" href="/assets/logo.png" />
 
     <link
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap"
@@ -13,6 +13,13 @@
 
     <!-- StyleSheet -->
     <link rel="stylesheet" href="style.css" />
+
+    <!-- Leaflet Map CDN -->
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+     
+     <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Leaflet Map CDN -->
+
     <!-- jQuery -->
     <script defer src="https://code.jquery.com/jquery-4.0.0.min.js" integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
     <!-- JavaScript -->
@@ -22,7 +29,7 @@
   </head>
   <body>
     <div class="sidebar">
-      <img src="./assets/fullLogo.png" alt="Logo" class="logo" />
+      <img src="/assets/fullLogo.png" alt="Logo" class="logo" />
 
       <ul class="workouts">
         <form class="form hidden">
@@ -31,6 +38,7 @@
             <select class="form__input form__input--type">
               <option value="running">Running</option>
               <option value="cycling">Cycling</option>
+              <option value="tracking">Tracking</option>
             </select>
           </div>
           <div class="form__row">
@@ -44,14 +52,16 @@
               placeholder="min"
             />
           </div>
-          <div class="form__row">
+          <!-- For Running & Tracking activities -->
+          <div class="form__row act_cadence">
             <label class="form__label">Cadence</label>
             <input
               class="form__input form__input--cadence"
               placeholder="step/min"
             />
           </div>
-          <div class="form__row form__row--hidden">
+          <!-- For Cycling activity -->
+          <div class="form__row act_elevation form__row--hidden">
             <label class="form__label">Elev Gain</label>
             <input
               class="form__input form__input--elevation"
@@ -111,14 +121,8 @@
       </ul>
 
       <p class="copyright">
-        &copy; Copyright by
-        <a
-          class="twitter-link"
-          target="_blank"
-          href="https://twitter.com/jonasschmedtman"
-          >Jonas Schmedtmann</a
-        >. Use for learning or your portfolio. Don't use to teach. Don't claim
-        as your own.
+        Marky &copy; Copyright
+        <span class="currYear">2000</span>
       </p>
     </div>
 
