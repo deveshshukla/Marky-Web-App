@@ -1,8 +1,8 @@
 'use strict';
 
 // Copyright dynamic year update
-let date = new Date();
-$('.currYear').html(date.getFullYear());
+let dateYr = new Date();
+$('.currYear').html(dateYr.getFullYear());
 
 
 // const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -20,7 +20,51 @@ const actElevation = $('.act_elevation');
 
 let map, mapEvent;
 
+// Blueprint Class
+class Workout {
+    date = new Date();
+    // unique id generate: last 10 digit of curr date
+    id = (Date.now() + '').slice(-10);
 
+    constructor (coords, distance, duration) {
+        this.coords = coords; // [lat, lng]
+        this.distance = distance; // in km
+        this.duration = duration; // in min
+    }
+};
+
+// ==+++== Child's classes ==+++==
+
+class RunTrack extends Workout {
+    constructor (coords, distance, duration, cadence) {
+        super(coords, distance, duration);
+        this.cadence = cadence;
+        
+        this.calcPace();
+    }
+
+    calcPace() {
+        this.pace = +(this.distance / this.duration).toFixed(2);
+        return this.pace;
+    }
+};
+
+class Cycling extends Workout {
+    constructor (coords, distance, duration, elevationGain) {
+        super(coords, distance, duration);
+        this.elevationGain = elevationGain;
+
+        this.calcSpeed();
+    }
+
+    calcSpeed() {
+        this.speed = +(this.distance / (this.duration / 60)).toFixed(2);
+        return this.speed;
+    }
+};
+
+
+// ==+++== App class ==+++==
 class App {
     constructor() {
         this.getPosition();
@@ -79,11 +123,44 @@ class App {
 
     newWorkout(e) {
         e.preventDefault();
+
+        // Get data from --> Form
+        const type = $('.form__input--type').val();
+        const distance = +$('.form__input--distance').val();
+        const duration = +$('.form__input--duration').val();
+
+        // Validation : Helper functions
+        const validInp = (...inputs) =>
+            inputs.every(inp => Number.isFinite(inp));
+
+        const positiveInp = (...inputs) =>
+            inputs.every(inp => inp > 0);
+
+        // If workout is run/track --> create RunTrack obj
+        if (type === 'running' || type === 'tracking') {
+            const cadence = +$('.form__input--cadence').val();
+
+            if (!validInp(distance, duration, cadence) || !positiveInp(distance, duration, cadence)) {
+                return alert('Invalid Input!');
+            }
+        }
+
+        // If workout is cycle --> create cycling obj
+        if (type === 'cycling') {
+            const elevation = +$('.form__input--elevation').val();
+
+            if (!validInp(distance, duration, elevation) || !positiveInp(distance, duration)) {
+                return alert('Invalid Input!');
+            }
+        }
+
+        // Add new obj to workout arr
+
             
         // Clear form
         clearForm();
         
-        // Display marker
+        // Render workout on map as a marker
         const { lat, lng } = mapEvent.latlng;
 
         L.marker([lat, lng])
@@ -107,7 +184,7 @@ class App {
 const app = new App();
 
 // Clear form & hide
-const clearForm = () => {
+function clearForm(){
     $('.form')[0].reset();
     form.addClass('hidden');
 }
