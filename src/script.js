@@ -36,6 +36,8 @@ class Workout {
 // ==+++== Child's classes ==+++==
 
 class RunTrack extends Workout {
+    type = 'running';
+    
     constructor (coords, distance, duration, cadence) {
         super(coords, distance, duration);
         this.cadence = cadence;
@@ -50,6 +52,8 @@ class RunTrack extends Workout {
 };
 
 class Cycling extends Workout {
+    type = 'cycling';
+    
     constructor (coords, distance, duration, elevationGain) {
         super(coords, distance, duration);
         this.elevationGain = elevationGain;
@@ -65,13 +69,15 @@ class Cycling extends Workout {
 
 
 // ==+++== App class ==+++==
+let workouts = []; 
+
 class App {
     constructor() {
         this.getPosition();
-        form.on('submit', this.newWorkout);
+        form.on('submit', (e) => this.newWorkout(e));
 
         // Change activity metric based on activity type
-        inputType.on('change', this.toggleElevationField);
+        inputType.on('change', (e) => this.toggleElevationField(e));
     }
 
     getPosition() {
@@ -128,6 +134,10 @@ class App {
         const type = $('.form__input--type').val();
         const distance = +$('.form__input--distance').val();
         const duration = +$('.form__input--duration').val();
+        const { lat, lng } = mapEvent.latlng;
+
+        // New workout variable
+        let workoutActivity;
 
         // Validation : Helper functions
         const validInp = (...inputs) =>
@@ -143,7 +153,9 @@ class App {
             if (!validInp(distance, duration, cadence) || !positiveInp(distance, duration, cadence)) {
                 return alert('Invalid Input!');
             }
-        }
+
+            workoutActivity = new RunTrack([lat, lng], distance, duration, cadence);
+        };
 
         // If workout is cycle --> create cycling obj
         if (type === 'cycling') {
@@ -152,18 +164,26 @@ class App {
             if (!validInp(distance, duration, elevation) || !positiveInp(distance, duration)) {
                 return alert('Invalid Input!');
             }
-        }
+
+            workoutActivity = new Cycling([lat, lng], distance, duration, elevation);
+        };
 
         // Add new obj to workout arr
+        workouts.push(workoutActivity);
+        console.log(workoutActivity);
+        
+        // Render workout marker on map
+        this.renderWorkoutMarker(workoutActivity);
 
-            
+        // Render workout on list
+        this.renderWorkoutList(workoutActivity);
+
         // Clear form
         clearForm();
-        
-        // Render workout on map as a marker
-        const { lat, lng } = mapEvent.latlng;
+    }
 
-        L.marker([lat, lng])
+    renderWorkoutMarker(workout) {
+        L.marker(workout.coords)
             .addTo(map)
             .bindPopup(
                 L.popup({
@@ -173,11 +193,29 @@ class App {
                     autoClose: false,
                     closeOnEscapeKey: false,
                     closeOnClick: false,
-                    className: 'tracking-popup',
+                    className: `${workout.type}-popup`,
                 })
             )
-            .setPopupContent('Tracking Event')
+            .setPopupContent(`${workout.type} activity`)
             .openPopup();
+    }
+
+    renderWorkoutList(workout) {
+        const html = ` <li class="workout workout--${workout.type}" data-id="${workout.id}">
+          <h2 class="workout__title">${workout.type.charAt(0).toUpperCase() + workout.type.slice(1)} on ${workout.date.toLocaleDateString()}</h2>
+          <div class="workout__details">
+            <span class="workout__icon">${workout.type === 'running' ? '🏃‍♂️' : '🚴'}</span>
+            <span class="workout__value">${workout.distance}</span>
+            <span class="workout__unit">km</span>
+          </div>
+          <div class="workout__details">
+            <span class="workout__icon">⏱</span>
+            <span class="workout__value">${workout.duration}</span>
+            <span class="workout__unit">min</span>
+          </div>
+        </li> `;
+        
+        containerWorkouts.append(html);
     }
 };
 
