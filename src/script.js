@@ -66,15 +66,18 @@ class Cycling extends Workout {
 
 
 // ==+++== App class ==+++==
-let workouts = []; 
 
 class App {
+    workouts = [];
+
     constructor() {
         this.getPosition();
         form.on('submit', (e) => this.newWorkout(e));
 
         // Change activity metric based on activity type
         inputType.on('change', (e) => this.toggleElevationField(e));
+
+        containerWorkouts.on('click', (e) => this.moveToPopup(e));
     }
 
     getPosition() {
@@ -167,9 +170,9 @@ class App {
             workoutActivity = new Cycling([lat, lng], distance, duration, elevation);
         };
 
-        // Add new obj to workout arr
-        workouts.push(workoutActivity);
-        console.log(workoutActivity);
+        // Add new obj to workout arr on this instance
+        this.workouts.push(workoutActivity);
+        console.log(this.workouts);
         
         // Render workout marker on map
         this.renderWorkoutMarker(workoutActivity);
@@ -268,6 +271,22 @@ class App {
         };
         
         containerWorkouts.append(html);
+    }
+
+    moveToPopup(e) {
+        const workoutEl = e.target.closest('.workout');
+
+        // Ignore null values
+        if(!workoutEl) return;
+
+        const workout = this.workouts.find(work => work.id === workoutEl.dataset.id);
+        console.log(workout);
+
+        // move to that marker
+        map.setView(workout.coords, 16, {
+            animate: true,
+            pan: { duration: 1 }
+        });
     }
 };
 
