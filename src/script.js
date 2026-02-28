@@ -36,11 +36,11 @@ class Workout {
 // ==+++== Child's classes ==+++==
 
 class RunTrack extends Workout {
-    type = 'running';
-    
-    constructor (coords, distance, duration, cadence) {
+    // type is now passed in rather than hard‑coded
+    constructor (coords, distance, duration, cadence, type = 'running') {
         super(coords, distance, duration);
         this.cadence = cadence;
+        this.type = type; // either 'running' or 'tracking'
         
         this.calcPace();
     }
@@ -154,7 +154,9 @@ class App {
                 return alert('Invalid Input!');
             }
 
-            workoutActivity = new RunTrack([lat, lng], distance, duration, cadence);
+            // pass the selected type to the constructor so the instance knows whether
+            // it is a run or a tracking workout
+            workoutActivity = new RunTrack([lat, lng], distance, duration, cadence, type);
         };
 
         // If workout is cycle --> create cycling obj
@@ -204,7 +206,15 @@ class App {
         const html = ` <li class="workout workout--${workout.type}" data-id="${workout.id}">
           <h2 class="workout__title">${workout.type.charAt(0).toUpperCase() + workout.type.slice(1)} on ${workout.date.toLocaleDateString()}</h2>
           <div class="workout__details">
-            <span class="workout__icon">${workout.type === 'running' ? '🏃‍♂️' : '🚴'}</span>
+            <span class="workout__icon">
+                ${
+                    {
+                        running: '🏃‍♂️',
+                        cycling: '🚴',
+                        tracking: '🧗'
+                    }[workout.type] || '❓' // Fallback for unknown types
+                }
+            </span>
             <span class="workout__value">${workout.distance}</span>
             <span class="workout__unit">km</span>
           </div>
