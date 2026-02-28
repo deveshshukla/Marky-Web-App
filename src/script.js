@@ -180,7 +180,6 @@ class App {
 
         // Add new obj to workout arr on this instance
         this.workouts.push(workoutActivity);
-        console.log(this.workouts);
         
         // Render workout marker on map
         this.renderWorkoutMarker(workoutActivity);
@@ -308,7 +307,6 @@ class App {
 
     getLocalStorage() {
         let storedData = JSON.parse(localStorage.getItem('workouts'));
-        console.log(storedData);
 
         // In-case of no data stored
         if (!storedData) return;
