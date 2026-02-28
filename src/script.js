@@ -4,9 +4,6 @@
 let dateYr = new Date();
 $('.currYear').html(dateYr.getFullYear());
 
-
-// const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
 const form = $('.form');
 const containerWorkouts = $('.workouts');
 const inputType = $('.form__input--type');
@@ -198,12 +195,22 @@ class App {
                     className: `${workout.type}-popup`,
                 })
             )
-            .setPopupContent(`${workout.type} activity`)
+            .setPopupContent(`
+                    ${
+                        {
+                            running: '🏃‍♂️',
+                            cycling: '🚴',
+                            tracking: '🧗'
+                        }[workout.type] || '❓' // Fallback for unknown types
+                    }
+
+                    ${workout.type.charAt(0).toUpperCase() + workout.type.slice(1)} on ${workout.date.toLocaleDateString()}
+                `)
             .openPopup();
     }
 
     renderWorkoutList(workout) {
-        const html = ` <li class="workout workout--${workout.type}" data-id="${workout.id}">
+        let html = ` <li class="workout workout--${workout.type}" data-id="${workout.id}">
           <h2 class="workout__title">${workout.type.charAt(0).toUpperCase() + workout.type.slice(1)} on ${workout.date.toLocaleDateString()}</h2>
           <div class="workout__details">
             <span class="workout__icon">
@@ -222,8 +229,43 @@ class App {
             <span class="workout__icon">⏱</span>
             <span class="workout__value">${workout.duration}</span>
             <span class="workout__unit">min</span>
-          </div>
-        </li> `;
+          </div>`;
+
+        if (workout.type === 'running' || workout.type === 'tracking') {
+            html += `
+                <div class="workout__details">
+                    <span class="workout__icon">⚡️</span>
+                    <span class="workout__value">
+                        ${workout.pace.toFixed(1)}
+                    </span>
+                    <span class="workout__unit">min/km</span>
+                </div>
+                <div class="workout__details">
+                    <span class="workout__icon">🦶🏼</span>
+                    <span class="workout__value">${workout.cadence}</span>
+                    <span class="workout__unit">spm</span>
+                </div>
+                </li>
+            `;
+        };
+
+        if (workout.type === 'cycling') {
+            html += `
+                <div class="workout__details">
+                    <span class="workout__icon">⚡️</span>
+                    <span class="workout__value">
+                        ${workout.speed.toFixed(1)}
+                    </span>
+                    <span class="workout__unit">km/h</span>
+                </div>
+                <div class="workout__details">
+                    <span class="workout__icon">⛰</span>
+                    <span class="workout__value">${workout.elevationGain}</span>
+                    <span class="workout__unit">m</span>
+                </div>
+                </li>
+            `;
+        };
         
         containerWorkouts.append(html);
     }
