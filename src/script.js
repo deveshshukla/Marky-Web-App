@@ -71,12 +71,15 @@ class App {
     workouts = [];
 
     constructor() {
+        // User location
         this.getPosition();
+
+        // Get data from local storage
+        this.getLocalStorage();
+
+        // Attach event handler to methods
         form.on('submit', (e) => this.newWorkout(e));
-
-        // Change activity metric based on activity type
         inputType.on('change', (e) => this.toggleElevationField(e));
-
         containerWorkouts.on('click', (e) => this.moveToPopup(e));
     }
 
@@ -106,6 +109,11 @@ class App {
 
         // Handle map click
         map.on('click', this.showForm);
+
+        // Render marker on map from localStorage
+        this.workouts.forEach (work => {
+            this.renderWorkoutMarker(work);
+        });
     }
 
     showForm(mapE) {
@@ -182,6 +190,9 @@ class App {
 
         // Clear form
         clearForm();
+
+        // Save all workout to local storage
+        this.setLocalStorage();
     }
 
     renderWorkoutMarker(workout) {
@@ -286,6 +297,54 @@ class App {
         map.setView(workout.coords, 16, {
             animate: true,
             pan: { duration: 1 }
+        });
+    }
+
+    // ++== Local storage set & get ==++
+    setLocalStorage() {
+        // Local storage API
+        localStorage.setItem('workouts', JSON.stringify(this.workouts));
+    }
+
+    getLocalStorage() {
+        let storedData = JSON.parse(localStorage.getItem('workouts'));
+        console.log(storedData);
+
+        // In-case of no data stored
+        if (!storedData) return;
+
+        // Rehydrate plain objects into actual class instances and restore Date
+        this.workouts = storedData.map(obj => {
+            let workout;
+            if (obj.type === 'running' || obj.type === 'tracking') {
+                workout = new RunTrack(
+                    obj.coords,
+                    obj.distance,
+                    obj.duration,
+                    obj.cadence,
+                    obj.type
+                );
+            } else if (obj.type === 'cycling') {
+                workout = new Cycling(
+                    obj.coords,
+                    obj.distance,
+                    obj.duration,
+                    obj.elevationGain
+                );
+            } else {
+                // unknown type, clone generically
+                workout = Object.assign(new Workout(), obj);
+            }
+
+            // restore properties that constructor may override
+            workout.date = new Date(obj.date);
+            workout.id = obj.id;
+            return workout;
+        });
+
+        // Now render that data to side workout-list
+        this.workouts.forEach(work => {
+            this.renderWorkoutList(work);
         });
     }
 };
