@@ -15,6 +15,8 @@ const inputElevation = $('.form__input--elevation');
 const actCadence = $('.act_cadence');
 const actElevation = $('.act_elevation');
 
+const btnDeleteAll = $('.btnDeleteAll');
+
 let map, mapEvent;
 
 // Blueprint Class
@@ -79,8 +81,12 @@ class App {
 
         // Attach event handler to methods
         form.on('submit', (e) => this.newWorkout(e));
+        
         inputType.on('change', (e) => this.toggleElevationField(e));
+        
         containerWorkouts.on('click', (e) => this.moveToPopup(e));
+
+        btnDeleteAll.on('click', (e) => this.deleteAll());
     }
 
     getPosition() {
@@ -344,6 +350,17 @@ class App {
         this.workouts.forEach(work => {
             this.renderWorkoutList(work);
         });
+    }
+
+    // Delete all activity from local storage
+    deleteAll() {
+        let confirmation = confirm('Warning! Delete All Activity');
+
+        if (confirmation) {
+            localStorage.removeItem('workouts');
+            location.reload();
+        }else
+            return;
     }
 };
 

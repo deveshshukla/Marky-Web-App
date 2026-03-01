@@ -50,10 +50,24 @@ a:visited {
   flex-direction: column;
 }
 
+.sideHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .logo {
   width: 130px;
   align-self: center;
   margin-bottom: 4rem;
+}
+
+.btnDeleteAll {
+  font-size: 1.5rem;
+  font-weight: 400;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-top: .7rem;
 }
 
 .workouts {
