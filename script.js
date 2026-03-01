@@ -230,7 +230,7 @@ class App {
 
     renderWorkoutList(workout) {
         let html = ` <li class="workout workout--${workout.type}" data-id="${workout.id}">
-          <h2 class="workout__title">${workout.type.charAt(0).toUpperCase() + workout.type.slice(1)} on ${workout.date.toLocaleDateString()}</h2>
+        <h2 class="workout__title">${workout.type.charAt(0).toUpperCase() + workout.type.slice(1)} on ${workout.date.toLocaleDateString()}</h2>
           <div class="workout__details">
             <span class="workout__icon">
                 ${
